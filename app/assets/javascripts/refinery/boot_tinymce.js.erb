@@ -1,13 +1,56 @@
 function init_tinymce_for(jq_selector) {
+	const LAYOUTS = {
+    airindemnite: '/assets/airindemnite.css',
+    airindemnite_minimalist: '/assets/airindemnite.css',
+  };
+
   tinymce.init({
     selector: jq_selector,
-    extended_valid_elements: 'i[*]',
+    extended_valid_elements: 'img[class|src|border|role|alt|title|width|height|loading=lazy]',
+		block_formats: 'Paragraph=p;H1=h1;H2=h2;H3=h3;H4=h4;H5=h5;H6=h6',
     menubar: false,
+    relative_urls: false,
+    remove_script_host: true,
     base_url: '/assets/tinymce',
-    toolbar: "undo redo | styleselect | style-p style-h1 style-h2 style-h3 | bold italic | bullist numlist outdent indent | refinerylink refineryimage | fullscreen | code",
-    content_css: '<%= asset_path "tinymce.scss", only_path: false %>',
-    plugins: ["image", "link", "lists", "fullscreen", "code", "stylebuttons", "refineryimage", "refinerylink"],
-    refinery_core_backend_route: '<%= Refinery::Core.backend_route %>'
+    toolbar: 'undo redo | formatselect | styleselect | bold italic emoticons nonbreaking | removeformat | table bullist numlist | refinerylink refineryimage template | fullscreen | code help',
+    content_css: document.querySelector('#layout-template') &&
+      LAYOUTS[document.querySelector('#layout-template').getAttribute('data-layout-template')] ||
+      LAYOUTS.airindemnite,
+    plugins: [
+			'code',
+			'emoticons',
+			'fullscreen',
+			'image',
+      'imagetools',
+      'importcss',
+			'help',
+			'link',
+			'nonbreaking',
+			'paste',
+			'table',
+			'template',
+			'lists',
+			'stylebuttons',
+			'refineryimage',
+			'refinerylink'
+		],
+    image_advtab: true,
+    imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions',
+
+    importcss_groups: [
+      { title: 'Font-colors', filter: /^\.cms\.(black|blue|orange)/ },
+      { title: 'Font-sizes', filter: /^\.cms\.(sub)?title/ },
+      { title: 'Do not use!' }
+    ],
+
+    paste_preprocess: function (plugin, args) {
+      args.content = args.content.replaceAll(' style="font-weight: 400;"', '');
+    },
+    refinery_core_backend_route: '<%= Refinery::Core.backend_route %>',
+    templates : [
+      { title: 'CTA', description: 'CTA vers le formulaire de réclamation, personnalisable', url: '/tinymce/templates/cta.html' },
+      { title: 'How does it work', description: 'Indemnisation de vol : les 3 étapes clés', url: '/tinymce/templates/how_does_it_work.html' }
+    ]
   })
 }
 
