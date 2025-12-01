@@ -53,6 +53,8 @@ function init_tinymce_for(jq_selector) {
 
     paste_preprocess: function (plugin, args) {
       args.content = args.content.replaceAll(' style="font-weight: 400;"', "");
+      const regex = / data-path-to-node="[\d,]*"/gi;
+      args.content = args.content.replaceAll(regex, "");
     },
     refinery_core_backend_route: "<%= Refinery::Core.backend_route %>",
     templates: [
